@@ -24,7 +24,7 @@ app.post("/test", (req: express.Request, res: express.Response) => {
 // to connect to mongodb url
 mongoose.connect(
   process.env.MONGOURI ||
-    "your local database url like {'mongodb://localhost:27017/your database name'}",
+    'mongo "mongodb+srv://socialmediacluster.8tztr.mongodb.net/<Social Media Backend>" --username SocialMediaApp',
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
