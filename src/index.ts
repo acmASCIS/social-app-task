@@ -5,7 +5,7 @@ import bodyParser from "body-parser";
 
 const app: express.Application = express();
 const port = process.env.PORT;
-
+var usersRouter = require('./routes/users');
 // body parser
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
@@ -21,9 +21,10 @@ app.post("/test", (req: express.Request, res: express.Response) => {
     age,
   });
 });
+
 // to connect to mongodb url
 mongoose.connect(
-  process.env.MONGOURI ||
+  process.env.MONGOURI||
     "your local database url like {'mongodb://localhost:27017/your database name'}",
   {
     useNewUrlParser: true,
@@ -39,3 +40,5 @@ mongoose.connect(
 app.listen(port, () => {
   console.log(`server is running on port ${port}`);
 });
+
+app.use('/users', usersRouter); 
