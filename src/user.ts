@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
-    id : {
+    Id : {
         type : Number,
         unique : true,
     },
@@ -14,7 +14,7 @@ const UserSchema = new mongoose.Schema({
         unique : true,
         required : true,
     },
-    CreatedAt : Date,
+    CreatedAt : String,
 });
 
 const User = mongoose.model('User', UserSchema);

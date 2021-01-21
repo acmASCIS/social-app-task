@@ -1,4 +1,7 @@
-const PostSchema = new mongoose.Schema({
+const user = require('./user');
+const mongoosee = require('mongoose');
+
+const PostSchema = new mongoosee.Schema({
     id : {
         type : Number,
         unique : true,
@@ -8,11 +11,11 @@ const PostSchema = new mongoose.Schema({
     },
     Image : String,
     CreatedBy : {
-        type : User,
+        type : String,
         required : true,
     },
     CreatedAt : Date,
 });
 
-const Post = mongoose.model('Post', PostSchema);
+const Post = mongoosee.model('Post', PostSchema);
 module.exports = Post;
