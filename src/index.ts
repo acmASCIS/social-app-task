@@ -55,6 +55,12 @@ app.listen(port, () => {
 
 //User Endpoints
 app.post("/users", async (req: express.Request, res: express.Response)=>{
+  const oldUser = await User.findOne({Email : req.body["Email"]});
+  if(oldUser != null){
+    res.json({"Error" : "Failed To Insert The User", "MSG" : "Thier Is A User With That Email"});
+    return;
+  }
+
   const newUser = new User(req.body);
   newUser["CreatedAt"] = new Date();
   await newUser.save();
@@ -62,12 +68,21 @@ app.post("/users", async (req: express.Request, res: express.Response)=>{
 });
 
 app.put("/users/:userId", async (req: express.Request, res: express.Response)=>{
+  const oldUser = await User.findOne({_id : req.params.userId});
+  if(oldUser == null){
+    res.json({"Error" : "Failed To Update The User", "MSG" : "User ID Is Not Found"});
+    return;
+  }
   const newUser = await User.updateOne({_id : req.params.userId}, req.body);
   res.json(newUser);
 });
 
 app.patch ("/users/:userId", async (req: express.Request, res: express.Response)=>{
   const oldUser = await User.findOne({_id : req.params.userId});
+  if(oldUser == null){
+    res.json({"Error" : "Failed To Update The User", "MSG" : "User ID Is Not Found"});
+    return;
+  }
   const newUser = {
     ...oldUser.toObject(),
     ...req.body,
@@ -85,20 +100,35 @@ app.get ("/users/:userId", async (req: express.Request, res: express.Response)=>
 });
 
 app.delete ("/users/:userId", async (req: express.Request, res: express.Response)=>{
+  const user = await User.findOne({_id : req.params.userId});
+  if(user == null){
+    res.json({"Error" : "Failed To Delete The User", "MSG" : "User ID Is Not Found"});
+    return;
+  }
   res.json(await User.deleteOne({_id : req.params.userId}));
 });
 ////////////////////////////////////////////////////////////////////////////////////////////
 //Post Endpoints
 app.post("/posts", async (req: express.Request, res: express.Response)=>{
-    const newPost = await new Post(req.body);
-    newPost["CreatedAt"] = new Date();
-    await newPost.save();
-    res.json(newPost).status(201);
+
+  if((await User.findOne({_id : req.body["CreatedBy"]})) == null){
+    res.json({"Error" : "Failed To Update The Post", "MSG" : "User ID Is Not Found"});
+    return;
+  }
+
+  const newPost = await new Post(req.body);
+  newPost["CreatedAt"] = new Date();
+  await newPost.save();
+  res.json(newPost).status(201);
 });
 
 app.put("/posts/:postId", async (req: express.Request, res: express.Response)=>{
 
   const post = await Post.findOne({_id : req.params.postId});
+  if(post == null){
+    res.json({"Error" : "Failed To Update The Post", "MSG" : "Post ID Is Not Found"});
+    return;
+  }
   post["Body"] = req.body["Body"];
   await post.save();
   res.json(post);
@@ -113,6 +143,11 @@ app.get ("/posts/:userId", async (req: express.Request, res: express.Response)=>
 });
 
 app.delete ("/posts/:postId", async (req: express.Request, res: express.Response)=>{
+  const user = await Post.findOne({_id : req.params.postId});
+  if(user == null){
+    res.json({"Error" : "Failed To Delete The Post", "MSG" : "Post ID Is Not Found"});
+    return;
+  }
   res.json(await Post.deleteOne({_id : req.params.postId}));
 });
 ////////////////////////////////////////////////////////////////////////////////////////////
