@@ -1,8 +1,4 @@
-# social-app-task
+# social-app-task (backend) [acmASCIS]
 
-# to start the project 
- 1- git clone https://github.com/acmASCIS/social-app-task.git<br>
- 2- cd social-app-task<br>
- 3- npm i<br>
- 4- fill in the data in dotenv file<br>
- 5- npm start <br>
+> 1. [Users endpoint in Postman](https://app.getpostman.com/run-collection/1ff9589dac78aa756161)
+> 2. [Posts endpoint in Postman](https://app.getpostman.com/run-collection/6414ff5bd7665991a15a)

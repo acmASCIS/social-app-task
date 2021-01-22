@@ -1,41 +1,36 @@
-import express from "express";
-require("dotenv").config();
-import mongoose from "mongoose";
-import bodyParser from "body-parser";
+import express, { Request, Response } from 'express';
+import dotenv from 'dotenv';
 
-const app: express.Application = express();
-const port = process.env.PORT;
+import bodyparser from 'body-parser';
 
-// body parser
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
+import { userRoute, postRoute, connectDB } from './requests';
 
-// test endpoints
-app.get("/test", (req: express.Request, res: express.Response) => {
-  res.json("test api endpoint");
+dotenv.config();
+
+const app = express();
+const port = process.env.localhost || 3000;
+
+const message = `listening to port ${port}, url: http://localhost:${port}/`;
+
+// temp
+const createNewDB = true;
+const isConnected = () => console.log('db is connected');
+
+connectDB(isConnected, createNewDB);
+
+app.get('/', (req: Request, res: Response) => {
+  res.send('now you can see me');
 });
-app.post("/test", (req: express.Request, res: express.Response) => {
-  const { name, age } = req.body;
-  res.json({
-    name,
-    age,
-  });
-});
-// to connect to mongodb url
-mongoose.connect(
-  process.env.MONGOURI ||
-    "your local database url like {'mongodb://localhost:27017/your database name'}",
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false,
-    useCreateIndex: true,
-  },
-  () => {
-    console.log("connected to database");
-  }
-);
 
-app.listen(port, () => {
-  console.log(`server is running on port ${port}`);
-});
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(bodyparser.json());
+
+app.use('/users', userRoute);
+app.use('/posts', postRoute);
+
+const onListen = () => {
+  console.log(message);
+};
+
+app.listen(port, onListen);
