@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import multer from "multer";
 import path from "path";
+import asyncHandler from 'express-async-handler';
 require("dotenv").config();
 
 const User = require('./user');
@@ -50,20 +51,20 @@ async function main() {
     );
 
     // user endpoints
-    app.post("/users", async (req: express.Request, res: express.Response) => {
+    app.post("/users", asyncHandler(async (req: express.Request, res: express.Response) => {
       const user = await User.create(req.body);
       res.json(user);
-    });
+    }));
 
-    app.put("/users/:userID", async (req: express.Request, res: express.Response) => {
+    app.put("/users/:userID", asyncHandler(async (req: express.Request, res: express.Response) => {
       const oldUserID = req.params.userID;
       const newUser = req.body;
 
       const result = await User.replaceOne({ "_id": oldUserID }, newUser);
       res.json(result);
-    });
+    }));
 
-    app.patch("/users/:userID", async (req: express.Request, res: express.Response) => {
+    app.patch("/users/:userID", asyncHandler(async (req: express.Request, res: express.Response) => {
       const updates = req.body;
       const userID = req.params.userID;
 
@@ -76,30 +77,30 @@ async function main() {
 
       const result = await User.updateOne({ "_id": userID }, updatedUser);
       res.json(result);
-    });
+    }));
 
-    app.get("/users", async (_req: express.Request, res: express.Response) => {
-        const users = await User.find({});
-        res.json(users);
-    });
+    app.get("/users", asyncHandler(async (_req: express.Request, res: express.Response) => {
+      const users = await User.find({});
+      res.json(users);
+    }));
 
-    app.get("/users/:userID", async (req: express.Request, res: express.Response) => {
+    app.get("/users/:userID", asyncHandler(async (req: express.Request, res: express.Response) => {
       const userID = req.params.userID;
 
       const user = await User.findOne({ "_id": userID });
       res.json(user);
-    });
+    }));
 
-    app.delete("/users/:userID", async (req: express.Request, res: express.Response) => {
+    app.delete("/users/:userID", asyncHandler(async (req: express.Request, res: express.Response) => {
       const userID = req.params.userID;
 
       const result = await User.deleteOne({ "_id": userID });
       res.json(result);
-    });
+    }));
 
 
     // post endpoints
-    app.post("/posts", upload.single('image'), async (req: express.Request, res: express.Response) => {
+    app.post("/posts", upload.single('image'), asyncHandler(async (req: express.Request, res: express.Response) => {
       var post = req.body;
       if (req.file != undefined) {
         post.image_URL = req.file.path;
@@ -107,9 +108,9 @@ async function main() {
 
       post = await Post.create(post);
       res.json(post);
-    });
+    }));
 
-    app.put("/posts/:postID", upload.single('image'), async (req: express.Request, res: express.Response) => {
+    app.put("/posts/:postID", upload.single('image'), asyncHandler(async (req: express.Request, res: express.Response) => {
       const oldPostID = req.params.postID;
 
       const newPost = req.body;
@@ -120,9 +121,9 @@ async function main() {
 
       const result = await Post.replaceOne({ "_id": oldPostID }, newPost);
       res.json(result);
-    });
+    }));
 
-    app.patch("/posts/:postID", upload.single('image'), async (req: express.Request, res: express.Response) => {
+    app.patch("/posts/:postID", upload.single('image'), asyncHandler(async (req: express.Request, res: express.Response) => {
       const postID = req.params.postID;
       const post = await Post.findOne({ "_id": postID });
 
@@ -138,32 +139,49 @@ async function main() {
 
       const result = await Post.updateOne({ "_id": postID }, updatedPost);
       res.json(result);
-    });
+    }));
 
-    app.get("/posts", async (_req: express.Request, res: express.Response) => {
+    app.get("/posts", asyncHandler(async (_req: express.Request, res: express.Response) => {
       const posts = await Post.find({});
       res.json(posts);
-    });
+    }));
 
-    app.get("/posts/:userID", async (req: express.Request, res: express.Response) => {
+    app.get("/posts/:userID", asyncHandler(async (req: express.Request, res: express.Response) => {
       const userID = req.params.userID;
       const userName = (await User.findOne({ "_id": userID })).name;
 
       const posts = await Post.find({ "created_by": userName });
       res.json(posts);
-    });
+    }));
 
-    app.delete("/posts/:postID", async (req: express.Request, res: express.Response) => {
+    app.delete("/posts/:postID", asyncHandler(async (req: express.Request, res: express.Response) => {
       const postID = req.params.postID;
 
       const result = await Post.deleteOne({ "_id": postID });
       res.json(result);
+    }));
+
+    app.use((req, res, next) => {
+      res.status(404).json({
+        status: 404,
+        message: "Page not found!"
+      });
     });
-    
+
+    app.use(((err, req, res, next) => {
+      console.log('we are here');
+      res.status(err.status).json({
+        status: err.status,
+        message: err.message
+      });
+
+    }) as express.ErrorRequestHandler);
+
 
     app.listen(port, () => {
       console.log(`server is running on port ${port}`);
     });
+
 
   } catch (error) {
     console.log(`Error! ${error}`);
