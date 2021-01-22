@@ -15,9 +15,9 @@ app.use(bodyParser.urlencoded());
 
 // DataBase Connection
 const Connect = async () => {
+  const URL : string = (process.env.MONGOURI || "");
   await mongoose.connect(
-    process.env.MONGOURI ||
-      "mongodb+srv://SocialMediaApp:SocialMediaApp148@socialmediacluster.8tztr.mongodb.net/SocialMediaApp?retryWrites=true&w=majority",
+    URL,
     {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -34,7 +34,9 @@ Connect();
 
 // test endpoints
 app.get("/test", async (req: express.Request, res: express.Response) => {
-  res.json(await User.find());
+  await User.deleteMany();
+  await Post.deleteMany();
+  res.json("DELETE THE DATABASE");
 });
 
 app.post("/test", async (req: express.Request, res: express.Response) => {
@@ -53,24 +55,24 @@ app.listen(port, () => {
 
 //User Endpoints
 app.post("/users", async (req: express.Request, res: express.Response)=>{
-  const body = req.body;
-  const newUser = User(body);
+  const newUser = new User(req.body);
+  newUser["CreatedAt"] = new Date();
   await newUser.save();
   res.json(newUser).status(201);
 });
 
 app.put("/users/:userId", async (req: express.Request, res: express.Response)=>{
-  const newUser = await User.updateOne({Id : req.params.userId}, req.body);
+  const newUser = await User.updateOne({_id : req.params.userId}, req.body);
   res.json(newUser);
 });
 
 app.patch ("/users/:userId", async (req: express.Request, res: express.Response)=>{
-  const oldUser = await User.findOne({Id : req.params.userId});
+  const oldUser = await User.findOne({_id : req.params.userId});
   const newUser = {
     ...oldUser.toObject(),
     ...req.body,
   }
-  const r = await User.updateOne({Id : req.params.userId}, newUser);
+  const r = await User.updateOne({_id : req.params.userId}, newUser);
   res.json(r).status(200);
 });
 
@@ -79,13 +81,38 @@ app.get ("/users", async (req: express.Request, res: express.Response)=>{
 });
 
 app.get ("/users/:userId", async (req: express.Request, res: express.Response)=>{
-  res.json(await User.findOne({Id : req.params.userId})).status(200);
+  res.json(await User.findOne({_id : req.params.userId})).status(200);
 });
 
 app.delete ("/users/:userId", async (req: express.Request, res: express.Response)=>{
-  res.json(await User.deleteOne({Id : req.params.userId}));
+  res.json(await User.deleteOne({_id : req.params.userId}));
 });
 ////////////////////////////////////////////////////////////////////////////////////////////
 //Post Endpoints
+app.post("/posts", async (req: express.Request, res: express.Response)=>{
+    const newPost = await new Post(req.body);
+    newPost["CreatedAt"] = new Date();
+    await newPost.save();
+    res.json(newPost).status(201);
+});
 
+app.put("/posts/:postId", async (req: express.Request, res: express.Response)=>{
+
+  const post = await Post.findOne({_id : req.params.postId});
+  post["Body"] = req.body["Body"];
+  await post.save();
+  res.json(post);
+});
+
+app.get ("/posts", async (req: express.Request, res: express.Response)=>{
+  res.json(await Post.find().sort({CreatedAt : 1})).status(200);
+});
+
+app.get ("/posts/:userId", async (req: express.Request, res: express.Response)=>{
+  res.json(await Post.find({CreatedBy : req.params.userId}).sort({CreatedAt : 1})).status(200);
+});
+
+app.delete ("/posts/:postId", async (req: express.Request, res: express.Response)=>{
+  res.json(await Post.deleteOne({_id : req.params.postId}));
+});
 ////////////////////////////////////////////////////////////////////////////////////////////

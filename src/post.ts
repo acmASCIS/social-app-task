@@ -1,14 +1,7 @@
-const user = require('./user');
 const mongoosee = require('mongoose');
 
 const PostSchema = new mongoosee.Schema({
-    id : {
-        type : Number,
-        unique : true,
-    },
-    Body : {
-        type : String,
-    },
+    Body : String,
     Image : String,
     CreatedBy : {
         type : String,

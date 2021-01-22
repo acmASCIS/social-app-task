@@ -1,10 +1,6 @@
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
-    Id : {
-        type : Number,
-        unique : true,
-    },
     Name : {
         type : String,
         required : true,
@@ -14,7 +10,7 @@ const UserSchema = new mongoose.Schema({
         unique : true,
         required : true,
     },
-    CreatedAt : String,
+    CreatedAt : Date,
 });
 
 const User = mongoose.model('User', UserSchema);
