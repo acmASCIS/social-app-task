@@ -24,8 +24,12 @@ router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
 
 // post endpoints
-router.post("/posts", upload.single('image'), asyncHandler(async (req: express.Request, res: express.Response) => {
+router.post("/posts/:userID", upload.single('image'), asyncHandler(async (req: express.Request, res: express.Response) => {
+    const userID = req.params.userID;
+    const userName = (await User.findOne({ "_id": userID })).name;
+
     var post = req.body;
+    post.created_by = userName;
     if (req.file != undefined) {
         post.image_URL = req.file.path;
     }

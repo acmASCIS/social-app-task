@@ -44,10 +44,18 @@ async function main() {
 
     // error handler
     app.use(((err, req, res, next) => {
-      res.status(err.status).json({
-        status: err.status,
-        message: err.message
-      });
+      if (err.status < 500) {
+        res.status(err.status).json({
+          status: err.status,
+          message: err.message
+        });
+      }
+      else {
+        res.status(500).json({
+          status: 500,
+          message: err.message
+        });
+      }
 
     }) as express.ErrorRequestHandler);
 
