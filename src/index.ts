@@ -2,14 +2,15 @@ import express from "express";
 require("dotenv").config();
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
-
+var createError = require('http-errors');
 const app: express.Application = express();
 const port = process.env.PORT;
-var usersRouter = require('./routes/users');
+var usersRouter = require('./routes/UsersRouter');
+var postsRouter = require('./routes/PostRouter');
 // body parser
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
 
+app.use(express.urlencoded({ extended: true }));
 // test endpoints
 app.get("/test", (req: express.Request, res: express.Response) => {
   res.json("test api endpoint");
@@ -41,4 +42,10 @@ app.listen(port, () => {
   console.log(`server is running on port ${port}`);
 });
 
+app.use('/uploads',express.static('uploads'));
 app.use('/users', usersRouter); 
+app.use('/posts', postsRouter); 
+
+app.use(function(req, res, next) {
+  next(createError(404));
+});
