@@ -5,7 +5,7 @@ const postSchema = new mongoose.Schema({
     body: String,
     image_URL: String
 },
-{ timestamps: true });
+    { timestamps: true });
 
 const Post = mongoose.model('posts', postSchema);
-module.exports = Post;
+export default Post;
