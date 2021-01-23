@@ -2,6 +2,7 @@ const express=require('express');
 const BodyParser=require('body-parser');
 const mongoose=require('mongoose');
 const Users=require('../models/user');
+const Posts=require('../models/posts');
 const UserRouter= express.Router();
 UserRouter.use(BodyParser.json());
 
@@ -70,8 +71,11 @@ UserRouter.route('/:userID')
       },(err)=>next(err)).catch((err)=>next(err));
 })
 .delete((req,res,next)=>{
+
     Users.findByIdAndRemove(req.params.userID)
     .then((resp)=>{
+        // delete every post that user own 
+        Posts.deleteMany({author:req.params.userID},(err)=>next(err)).catch((err)=>next(err));
         res.statusCode=200;
         res.setHeader('content-type','application/json');
         res.json(resp);
