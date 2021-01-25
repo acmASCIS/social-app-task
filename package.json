@@ -1,9 +1,14 @@
 {
+<<<<<<< HEAD
   "name": "api-task",
+=======
+  "name": "social-app",
+>>>>>>> social-app/master
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
+<<<<<<< HEAD
     "start": "ts-node ./src/index.ts"
   },
   "keywords": [],
@@ -19,5 +24,18 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "mongoose": "^5.11.11"
+=======
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "form-data": "^3.0.0",
+    "mongoose": "^5.11.12",
+    "multer": "^1.4.2"
+>>>>>>> social-app/master
   }
 }
