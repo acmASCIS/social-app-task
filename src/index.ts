@@ -3,6 +3,8 @@ require("dotenv").config();
 import mongoose from "mongoose";
 import postsRoute from "./routes/PostsRoute";
 import userRoute from './routes/UserRoute';
+
+
 const app: express.Application = express();
 const port = process.env.PORT;
 
@@ -51,6 +53,8 @@ mongoose.connect(
     console.log("connected to database");
   }
 );
+
+
 
 app.listen(port, () => {
   console.log(`server is running on port ${port}`);
