@@ -1,19 +1,26 @@
 import express from "express";
 require("dotenv").config();
 import mongoose from "mongoose";
+import postsRoute from "./routes/PostsRoute";
 import userRoute from './routes/UserRoute';
 const app: express.Application = express();
 const port = process.env.PORT;
 
+
+
+
 // body parser
 app.use(express.json());
-app.use(express.urlencoded());
+app.use(express.urlencoded({limit:'50mb',extended:true}));
+
 
 
 
 //endpoints
 
 app.use('/users',userRoute);
+
+app.use('/posts',postsRoute)
 
 
 // test endpoints
