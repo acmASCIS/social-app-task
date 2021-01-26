@@ -1,0 +1,20 @@
+{
+  "documentation": {
+    "usersEndpoints": {
+      "post": "@/users - create a new user - body(name: required, email: required).",
+      "put": "@/users/:userId - replace a user with another user - body(name: required, email: required).",
+      "patch": "@/users/:userId - update an existing user - body(name: optional, email: optional).",
+      "get": {
+        "all": "@/users - retrieve all users.",
+        "user": "@/users/:userId - retrieve specific user."
+      },
+      "delete": "@/users - delete a user."
+    },
+    "postsEndpoints": {
+      "post": "@/posts - create a new post - body(text: required, image: optional, createdBy: required)  - NOTE: posting a post requires using form-data.",
+      "put": "@/posts/:postId -  replace a post - body(text).",
+      "delete": "@/posts/:postId - delete a post.",
+      "get": "@/posts/ - retrieve all posts - query(userId=<userId> - filters posts by specific user)."
+    }
+  }
+}
