@@ -1,35 +1,20 @@
 import express from "express";
-import bodyParser from "body-parser";
 import asyncHandler from 'express-async-handler';
-import multer from "multer";
-import path from "path";
+import fs from "fs-extra";
 import Post from '../models/post';
-import User from '../models/user';
+import upload from "../imageStorage";
 
 const router = express.Router();
-// image storage
-const storage = multer.diskStorage({
-    destination: function (_req, _file, cb) {
-        cb(null, './public/images')
-    },
-    filename: function (_req, file, cb) {
-        cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
-    }
-});
-const upload = multer({ storage: storage });
 
 // midlewares
 router.use('/public', express.static('public'));
-router.use(bodyParser.json());
-router.use(bodyParser.urlencoded({ extended: true }));
 
 // post endpoints
 router.post("/posts/:userID", upload.single('image'), asyncHandler(async (req: express.Request, res: express.Response) => {
     const userID = req.params.userID;
-    const userName = (await User.findOne({ "_id": userID })).name;
 
     var post = req.body;
-    post.created_by = userName;
+    post.created_by = userID;
     if (req.file != undefined) {
         post.image_URL = req.file.path;
     }
@@ -40,6 +25,11 @@ router.post("/posts/:userID", upload.single('image'), asyncHandler(async (req: e
 
 router.put("/posts/:postID", upload.single('image'), asyncHandler(async (req: express.Request, res: express.Response) => {
     const oldPostID = req.params.postID;
+    const oldImgPath = (await Post.findOne({ "_id": oldPostID })).image_URL;
+
+    if (oldImgPath != undefined) {
+        await fs.remove(oldImgPath);
+    }
 
     const newPost = req.body;
     if (req.file != undefined) {
@@ -47,16 +37,21 @@ router.put("/posts/:postID", upload.single('image'), asyncHandler(async (req: ex
     }
     newPost.created_by = (await Post.findOne({ "_id": oldPostID })).created_by;
 
-    const result = await Post.replaceOne({ "_id": oldPostID }, newPost);
-    res.json(result);
+    await Post.replaceOne({ "_id": oldPostID }, newPost);
+    res.json('Post replaced successfully.');
 }));
 
 router.patch("/posts/:postID", upload.single('image'), asyncHandler(async (req: express.Request, res: express.Response) => {
     const postID = req.params.postID;
     const post = await Post.findOne({ "_id": postID });
 
-    var updates = req.body;
+    const updates = req.body;
     if (req.file != undefined) {
+
+        const oldImgPath = (await Post.findOne({ "_id": postID })).image_URL;
+        if (oldImgPath != undefined) {
+            await fs.remove(oldImgPath);
+        }
         updates.image_URL = req.file.path;
     }
 
@@ -65,28 +60,38 @@ router.patch("/posts/:postID", upload.single('image'), asyncHandler(async (req: 
         ...updates
     }
 
-    const result = await Post.updateOne({ "_id": postID }, updatedPost);
-    res.json(result);
+    await Post.updateOne({ "_id": postID }, updatedPost);
+    res.json('Post updated successfully.');
 }));
 
 router.get("/posts", asyncHandler(async (_req: express.Request, res: express.Response) => {
-    const posts = await Post.find({});
+    const posts = await Post.find({}).sort({ "createdAt": -1 });
     res.json(posts);
 }));
 
 router.get("/posts/:userID", asyncHandler(async (req: express.Request, res: express.Response) => {
     const userID = req.params.userID;
-    const userName = (await User.findOne({ "_id": userID })).name;
 
-    const posts = await Post.find({ "created_by": userName });
+    const posts = await Post.find({ "created_by": userID }).sort({ "createdAt": -1 });
     res.json(posts);
 }));
 
 router.delete("/posts/:postID", asyncHandler(async (req: express.Request, res: express.Response) => {
     const postID = req.params.postID;
 
-    const result = await Post.deleteOne({ "_id": postID });
-    res.json(result);
+    if (await Post.exists({ "_id": postID })) {
+
+        const oldImgPath = (await Post.findOne({ "_id": postID })).image_URL;
+        if (oldImgPath != undefined) {
+            await fs.remove(oldImgPath);
+        }
+        await Post.deleteOne({ "_id": postID });
+        res.json('Post deleted successfully.');
+    }
+    else {
+        res.json('Post not found.');
+    }
+
 }));
 
 export default router;

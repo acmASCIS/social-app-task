@@ -1,12 +1,8 @@
 import express from "express";
-import bodyParser from "body-parser";
 import asyncHandler from 'express-async-handler';
 import User from "../models/user";
 
 const router = express.Router();
-
-// midlewares
-router.use(bodyParser.json());
 
 // user endpoints
 router.post("/users", asyncHandler(async (req: express.Request, res: express.Response) => {
@@ -52,8 +48,15 @@ router.get("/users/:userID", asyncHandler(async (req: express.Request, res: expr
 router.delete("/users/:userID", asyncHandler(async (req: express.Request, res: express.Response) => {
     const userID = req.params.userID;
 
-    const result = await User.deleteOne({ "_id": userID });
-    res.json(result);
+    if (await User.exists({ "_id": userID })){
+        
+        await User.deleteOne({ "_id": userID });
+        res.json('User deleted successfully.');
+    }
+    else{
+        res.json('User not found.');
+    }
+
 }));
 
 export default router;

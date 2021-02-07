@@ -12,6 +12,7 @@ const mongoURI = process.env.MONGOURI || 'mongodb://localhost:27017/socialapp';
 
 // body parser
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(userRouter);
 app.use(postRouter);

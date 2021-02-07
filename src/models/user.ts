@@ -1,8 +1,19 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
-    name: String,
-    email: String
+    name: {
+        type: String,
+        required: true,
+        minlength: 5,
+        maxlength: 20
+    },
+    email: {
+        type: String,
+        required: true,
+        minlength: 10,
+        maxlength: 30,
+        unique: true
+    }
 },
     { timestamps: true });
 
