@@ -1,8 +1,8 @@
 import express from "express";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
-import userRouter from "./controllers/userController";
-import postRouter from "./controllers/postController";
+import userRouter from "./routes/userRoutes";
+import postRouter from "./routes/postRoutes";
 
 require("dotenv").config();
 
@@ -16,6 +16,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(userRouter);
 app.use(postRouter);
+app.use('/public', express.static('public'));
 
 async function main() {
 
