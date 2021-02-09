@@ -1,25 +1,23 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+import mongoose from "mongoose";
+const Schema = mongoose.Schema;
 
-var postSchema = new Schema({
-    body:{
-         type:String,
-         default:'',
-         required:true
+const postSchema = new Schema(
+  {
+    body: {
+      type: String,
+      required: true,
     },
-   image:{
-        type:String,
-        default:'',
-   },
-   author:{
-       type: mongoose.Schema.Types.ObjectId,
-       ref: 'User',
-       required:true
+    image: {
+      type: String,
+      default: "",
+    },
+    author: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+  },
+  { timestamps: true }
+);
 
-   }
-   
-},{ timestamps: true});
-
-
-
-module.exports = mongoose.model('Post', postSchema);
+module.exports = mongoose.model("Post", postSchema);

@@ -2,11 +2,13 @@ import express from "express";
 require("dotenv").config();
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
-var createError = require('http-errors');
+import createError from "http-errors";
+import usersRouter from "./routes/UsersRouter";
+import postsRouter from "./routes/PostRouter";
 const app: express.Application = express();
 const port = process.env.PORT;
-var usersRouter = require('./routes/UsersRouter');
-var postsRouter = require('./routes/PostRouter');
+
+
 // body parser
 app.use(bodyParser.json());
 
@@ -25,7 +27,7 @@ app.post("/test", (req: express.Request, res: express.Response) => {
 
 // to connect to mongodb url
 mongoose.connect(
-  process.env.MONGOURI||
+  process.env.MONGOURI ||
     "your local database url like {'mongodb://localhost:27017/your database name'}",
   {
     useNewUrlParser: true,
@@ -42,10 +44,10 @@ app.listen(port, () => {
   console.log(`server is running on port ${port}`);
 });
 
-app.use('/uploads',express.static('uploads'));
-app.use('/users', usersRouter); 
-app.use('/posts', postsRouter); 
+app.use("/uploads", express.static("uploads"));
+app.use("/users", usersRouter);
+app.use("/posts", postsRouter);
 
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
