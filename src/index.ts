@@ -2,14 +2,17 @@ import express from "express";
 require("dotenv").config();
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
-
+import createError from "http-errors";
+import usersRouter from "./routes/UsersRouter";
+import postsRouter from "./routes/PostRouter";
 const app: express.Application = express();
 const port = process.env.PORT;
 
+
 // body parser
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
 
+app.use(express.urlencoded({ extended: true }));
 // test endpoints
 app.get("/test", (req: express.Request, res: express.Response) => {
   res.json("test api endpoint");
@@ -21,6 +24,7 @@ app.post("/test", (req: express.Request, res: express.Response) => {
     age,
   });
 });
+
 // to connect to mongodb url
 mongoose.connect(
   process.env.MONGOURI ||
@@ -38,4 +42,12 @@ mongoose.connect(
 
 app.listen(port, () => {
   console.log(`server is running on port ${port}`);
+});
+
+app.use("/uploads", express.static("uploads"));
+app.use("/users", usersRouter);
+app.use("/posts", postsRouter);
+
+app.use(function (req, res, next) {
+  next(createError(404));
 });
